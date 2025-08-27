@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Courses from "./pages/Courses";
 import TeacherCourses from "./pages/teachers/TeacherCourses";
-import Upload from "./pages/teachers/upload";
+import Upload from "./pages/teachers/Upload";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import OpenedCourse from "./pages/OpenedCourse";

@@ -3,7 +3,7 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Courses from "./pages/Courses";
-import TeacherCourses from "./pages/teachers/teacherCourses";
+import TeacherCourses from "./pages/teachers/TeacherCourses";
 import Upload from "./pages/teachers/upload";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";

@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { FaBookOpen, FaPlusCircle, FaBars, FaTimes } from "react-icons/fa";
+import {
+  FaBookOpen,
+  FaPlusCircle,
+  FaBars,
+  FaTimes,
+  FaUser,
+} from "react-icons/fa";
+import { useAuth } from "../contexts/AuthContext";
 
 const TeacherLayout = ({ children }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { currentUser, handleSignOut } = useAuth();
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -35,11 +43,11 @@ const TeacherLayout = ({ children }) => {
 
         <nav className="flex flex-col p-4 gap-2 text-gray-700 font-medium">
           <NavLink
-            to="/teacherCourses"
+            to="/teacher/teacherCourses"
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-2 rounded-lg transition ${
                 isActive
-                  ? "bg-blue-500 text-white"
+                  ? "bg-gray-600/60 text-white"
                   : "hover:bg-gray-200 hover:text-blue-600"
               }`
             }
@@ -49,11 +57,11 @@ const TeacherLayout = ({ children }) => {
           </NavLink>
 
           <NavLink
-            to="/upload"
+            to="/teacher/upload"
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-2 rounded-lg transition ${
                 isActive
-                  ? "bg-blue-500 text-white"
+                  ? "bg-gray-600/60 text-white"
                   : "hover:bg-gray-200 hover:text-blue-600"
               }`
             }
@@ -61,6 +69,29 @@ const TeacherLayout = ({ children }) => {
             <FaPlusCircle className="text-lg" />
             إنشاء كورس
           </NavLink>
+
+          <NavLink
+            to="/teacher/profile"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-2 rounded-lg transition ${
+                isActive
+                  ? "bg-gray-600/60 text-white"
+                  : "hover:bg-gray-200 hover:text-blue-600"
+              }`
+            }
+          >
+            <FaUser className="text-lg" />
+            الملف الشخصي
+          </NavLink>
+
+          {currentUser && (
+            <button
+              onClick={handleSignOut}
+              className="mt-4 bg-red-600 text-white hover:bg-red-700 px-4 py-2 text-sm rounded-md"
+            >
+              تسجيل خروج
+            </button>
+          )}
         </nav>
       </div>
 

@@ -1,0 +1,10 @@
+1- UI / UX => Done
+2- Functionality :
+    * Authentication & handle redirect after Authentication if teacher redirect to /teacher/teacherCourses if not redirect to / (Supabase) => Done
+  TEACHER :
+    * CRUD For Teacher (Add Playlist , Display , Delete) =>
+  
+  STUDENT :
+  * Show Courses & Filter & Search =>
+  * Show Course Details =>
+  * Subscribe Course =>

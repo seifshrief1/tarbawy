@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { CiSearch, CiUser } from "react-icons/ci";
 import { HiMenu, HiX } from "react-icons/hi";
+import { useAuth } from "../contexts/AuthContext";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const { currentUser, handleSignOut } = useAuth();
   return (
-    <nav className="w-full bg-white shadow-md px-6 py-3 flex items-center justify-between">
-      {/* Mobile Menu Button (Right on small screens) */}
+    <nav className="w-full bg-white shadow-md px-6 py-3 flex items-center justify-between sticky top-0 z-50">
       <div className="md:hidden">
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -20,6 +20,14 @@ const Navbar = () => {
 
       {/* Nav Links (Right for desktop) */}
       <div className="hidden md:flex space-x-6 text-gray-700 font-semibold">
+        {currentUser && (
+          <Link
+            to={"/profile"}
+            className="hover:text-blue-600 transition duration-300"
+          >
+            الملف الشخصي
+          </Link>
+        )}
         <Link
           to={"/about"}
           className="hover:text-blue-600 transition duration-300"
@@ -37,23 +45,27 @@ const Navbar = () => {
         </Link>
       </div>
 
-      {/* Logo (Center) */}
-      <Link to="/" className="flex-1 text-center">
-        <img
-          src="https://lmsolutionsllc.com/wp-content/uploads/2022/10/LMS-Updated-Logo.png"
-          className="w-32 mx-auto"
-          alt="Logo"
-        />
+      <Link to="/" className="text-center flex justify-center">
+        <h2 className="text-blue-600 font-bold text-4xl">Tarbawy</h2>
       </Link>
 
       {/* Icons (Left) */}
-      <div className="flex space-x-4 text-gray-700 text-2xl">
+      <div className="flex space-x-4 text-gray-700 text-2xl items-center">
         <Link to={"/courses"} className="hover:text-blue-600">
           <CiSearch />
         </Link>
-        <button className="hover:text-blue-600">
-          <CiUser />
-        </button>
+        {currentUser ? (
+          <button
+            onClick={handleSignOut}
+            className="bg-red-600 text-white hover:bg-red-700 px-4 py-2 text-sm rounded-md cursor-pointer transition duration-300"
+          >
+            تسجيل خروج
+          </button>
+        ) : (
+          <Link to={"/signin"} className="hover:text-blue-600">
+            <CiUser />
+          </Link>
+        )}
       </div>
 
       {/* Mobile Menu (Dropdown) */}
@@ -80,6 +92,14 @@ const Navbar = () => {
           >
             معلومات عنا
           </Link>
+          {currentUser && (
+            <Link
+              to={"/profile"}
+              className="hover:text-blue-600 transition duration-300"
+            >
+              الملف الشخصي
+            </Link>
+          )}
         </div>
       )}
     </nav>

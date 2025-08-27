@@ -25,7 +25,7 @@ const TeacherCourses = () => {
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">كورساتي</h1>
           <Link
-            to={"/upload"}
+            to={"/teacher/upload"}
             className="px-4 py-2 bg-blue-600 text-center text-white rounded-lg hover:bg-blue-700 transition"
           >
             + اضافة كورس جديد

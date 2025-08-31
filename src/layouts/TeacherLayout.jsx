@@ -15,7 +15,6 @@ const TeacherLayout = ({ children }) => {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Mobile Sidebar Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-30 md:hidden"
@@ -87,7 +86,7 @@ const TeacherLayout = ({ children }) => {
           {currentUser && (
             <button
               onClick={handleSignOut}
-              className="mt-4 bg-red-600 text-white hover:bg-red-700 px-4 py-2 text-sm rounded-md"
+              className="mt-4 bg-red-600 text-white hover:bg-red-700 px-4 py-2 text-sm rounded-md transition duration-300 cursor-pointer"
             >
               تسجيل خروج
             </button>

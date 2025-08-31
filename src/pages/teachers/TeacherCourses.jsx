@@ -1,24 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import TeacherLayout from "../../layouts/TeacherLayout";
 import { Link } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
-
-const courses = [
-  {
-    id: 1,
-    title: "كورس اللغة الإنجليزية",
-    description: "مستوي المبتدئين لتعلم أساسيات اللغة الإنجليزية.",
-    students: 25,
-  },
-  {
-    id: 2,
-    title: "كورس اللغة العربية",
-    description: "كورس شامل لتعلم القواعد والنحو.",
-    students: 18,
-  },
-];
+import { useCrud } from "../../contexts/CrudContext";
 
 const TeacherCourses = () => {
+  const { courses, handleDeleteCourse } = useCrud();
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
+
+  const handleDeleteClick = (courseId) => {
+    setSelectedCourseId(courseId);
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (selectedCourseId) {
+      await handleDeleteCourse(selectedCourseId);
+      setShowModal(false);
+      setSelectedCourseId(null);
+    }
+  };
+
   return (
     <TeacherLayout>
       <div className="p-6">
@@ -33,22 +36,53 @@ const TeacherCourses = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {courses.map((course) => (
-            <div
-              key={course.id}
-              className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition border"
-            >
-              <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
-              <p className="text-gray-600 mb-4">{course.description}</p>
-              <div className="flex justify-between items-center text-sm text-gray-500">
-                <span>👥 {course.students} طالب</span>
-                <button className="px-3 py-1 bg-gray-100 rounded-lg hover:bg-gray-200 text-red-500">
+          {courses.length === 0 ? (
+            <p className="text-red-500 text-center text-3xl col-span-2">
+              لا يوجد لديك كورسات حتي الان
+            </p>
+          ) : (
+            courses.map((course) => (
+              <div
+                key={course.id}
+                className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition border"
+              >
+                <h2 className="text-xl font-semibold mb-2">{course.title}</h2>
+                <p className="text-gray-600 mb-4">{course.description}</p>
+                <button
+                  onClick={() => handleDeleteClick(course.id)}
+                  className="px-3 py-1 bg-gray-100 rounded-lg hover:bg-gray-200 text-red-500 cursor-pointer"
+                >
                   <FaTrash />
                 </button>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
+
+        {/* Modal */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-xl shadow-xl w-96">
+              <h2 className="text-lg font-semibold mb-4 text-gray-800">
+                هل أنت متأكد من حذف هذا الكورس؟
+              </h2>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+                >
+                  إلغاء
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  حذف
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </TeacherLayout>
   );

@@ -1,47 +1,43 @@
 import React, { useState } from "react";
 import TeacherLayout from "../../layouts/TeacherLayout";
+import { useCrud } from "../../contexts/CrudContext";
+import { toast } from "react-toastify";
 
 const Upload = () => {
-  // حالة لإدارة قائمة التشغيل الحالية والفيديوهات الخاصة بها
+  const { handleUploadCourse } = useCrud();
+  const [loading, setLoading] = useState(false);
   const [playlists, setPlaylists] = useState([{ name: "", videos: [] }]);
-  // حالة لإدارة عنوان الكورس
   const [courseTitle, setCourseTitle] = useState("");
-  // حالة لإدارة وصف الكورس
   const [courseDescription, setCourseDescription] = useState("");
-  // حالة لإدارة ما سيتعلمه الطالب
   const [whatWillLearn, setWhatWillLearn] = useState("");
-  // حالة لإدارة مدة الدورة
   const [courseDuration, setCourseDuration] = useState("");
-  // حالة لإدارة الصورة المصغرة
   const [courseThumbnail, setCourseThumbnail] = useState(null);
+  const [grade, setGrade] = useState("");
+  const [courseContent, setCourseContent] = useState("");
+  const [lessonsCount, setLessonsCount] = useState("");
 
-  // دالة لإضافة قائمة تشغيل جديدة
   const addPlaylist = () => {
     setPlaylists([...playlists, { name: "", videos: [] }]);
   };
 
-  // دالة لإضافة فيديو إلى قائمة تشغيل محددة
   const addVideoToPlaylist = (playlistIndex) => {
     const newPlaylists = [...playlists];
     newPlaylists[playlistIndex].videos.push({ title: "", file: null });
     setPlaylists(newPlaylists);
   };
 
-  // دالة للتعامل مع تغيير اسم قائمة التشغيل
   const handlePlaylistNameChange = (e, index) => {
     const newPlaylists = [...playlists];
     newPlaylists[index].name = e.target.value;
     setPlaylists(newPlaylists);
   };
 
-  // دالة للتعامل مع تغيير اسم الفيديو
   const handleVideoNameChange = (e, playlistIndex, videoIndex) => {
     const newPlaylists = [...playlists];
     newPlaylists[playlistIndex].videos[videoIndex].title = e.target.value;
     setPlaylists(newPlaylists);
   };
 
-  // دالة للتعامل مع اختيار ملف الفيديو
   const handleVideoFileChange = (e, playlistIndex, videoIndex) => {
     const newPlaylists = [...playlists];
     newPlaylists[playlistIndex].videos[videoIndex].file = e.target.files[0];
@@ -51,6 +47,56 @@ const Upload = () => {
   // دالة للتعامل مع اختيار ملف الصورة المصغرة
   const handleThumbnailChange = (e) => {
     setCourseThumbnail(e.target.files[0]);
+  };
+
+  // دالة الرفع الرئيسية
+  const handlePublish = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (
+      !courseThumbnail ||
+      !courseTitle ||
+      !courseDescription ||
+      !grade ||
+      !courseContent ||
+      !lessonsCount ||
+      !whatWillLearn ||
+      !courseDuration ||
+      playlists.length === 0
+    ) {
+      toast.error("جميع الحقول مطلوبة!");
+      setLoading(false);
+      return;
+    }
+
+    if (!grade) {
+      toast.error("يجب اختيار الصف الدراسي");
+      setLoading(false);
+      return;
+    }
+
+    const courseInfo = {
+      courseTitle,
+      courseDescription,
+      whatWillLearn,
+      courseDuration,
+      courseThumbnail,
+      playlists,
+      grade,
+      courseContent,
+      lessonsCount,
+    };
+
+    const result = await handleUploadCourse(courseInfo);
+
+    setLoading(false);
+
+    if (result.success) {
+      toast.success("تم رفع الدورة بنجاح!");
+    } else {
+      toast.error("فشل في رفع الدورة: " + result.error);
+    }
   };
 
   return (
@@ -73,50 +119,95 @@ const Upload = () => {
               </label>
               <input
                 type="text"
-                placeholder="مثال: دورة أساسيات البرمجة"
+                placeholder="مثال: شرح منهج اللغة العربية للصف الأول الإعدادي"
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                 value={courseTitle}
                 onChange={(e) => setCourseTitle(e.target.value)}
               />
             </div>
 
-            {/* Course Description */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-semibold mb-1 text-gray-700">
+                  وصف الدورة
+                </label>
+                <textarea
+                  placeholder="اكتب وصفًا قصيرًا وواضحًا يوضح محتوى الدورة."
+                  className="w-full border border-gray-300 rounded-lg p-3 h-24 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                  value={courseDescription}
+                  onChange={(e) => setCourseDescription(e.target.value)}
+                ></textarea>
+              </div>
+
+              {/* What will learn */}
+              <div>
+                <label className="block font-semibold mb-1 text-gray-700">
+                  ماذا سيتعلم الطالب؟
+                </label>
+                <textarea
+                  placeholder="اكتب النقاط الرئيسية في شكل نقاط (مثال: تذكر اهم نقاط المنهج)."
+                  className="w-full border border-gray-300 rounded-lg p-3 h-24 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                  value={whatWillLearn}
+                  onChange={(e) => setWhatWillLearn(e.target.value)}
+                ></textarea>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-semibold mb-1 text-gray-700">
+                  مدة الدورة
+                </label>
+                <input
+                  type="text"
+                  placeholder="مثال: 10 ساعات أو 4 أسابيع"
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                  value={courseDuration}
+                  onChange={(e) => setCourseDuration(e.target.value)}
+                />
+              </div>
+              {/* Grade (الصف الدراسي) */}
+              <div>
+                <label className="block font-semibold mb-1 text-gray-700">
+                  الصف الدراسي
+                </label>
+                <select
+                  className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                  value={grade}
+                  onChange={(e) => setGrade(e.target.value)}
+                >
+                  <option value="">اختر الصف</option>
+                  <option value="الأول الإعدادي">الأول الإعدادي</option>
+                  <option value="الثاني الإعدادي">الثاني الإعدادي</option>
+                  <option value="الثالث الإعدادي">الثالث الإعدادي</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Course Content */}
             <div>
               <label className="block font-semibold mb-1 text-gray-700">
-                وصف الدورة
+                محتوى الدورة
               </label>
               <textarea
-                placeholder="اكتب وصفًا قصيرًا وواضحًا يوضح محتوى الدورة."
-                className="w-full border border-gray-300 rounded-lg p-3 h-24 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-                value={courseDescription}
-                onChange={(e) => setCourseDescription(e.target.value)}
+                placeholder={`الوحدة الأولى\n- الدرس الأول\n- الدرس الثاني\n\nالوحدة الثانية\n- الدرس الأول\n- الدرس الثاني`}
+                className="w-full border border-gray-300 rounded-lg p-3 h-32 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                value={courseContent}
+                onChange={(e) => setCourseContent(e.target.value)}
               ></textarea>
             </div>
 
-            {/* What will learn */}
+            {/* Lessons Count */}
             <div>
               <label className="block font-semibold mb-1 text-gray-700">
-                ماذا سيتعلم الطالب؟
-              </label>
-              <textarea
-                placeholder="اكتب النقاط الرئيسية في شكل نقاط (مثال: بناء مواقع ويب)."
-                className="w-full border border-gray-300 rounded-lg p-3 h-24 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-                value={whatWillLearn}
-                onChange={(e) => setWhatWillLearn(e.target.value)}
-              ></textarea>
-            </div>
-
-            {/* Course Duration */}
-            <div>
-              <label className="block font-semibold mb-1 text-gray-700">
-                مدة الدورة (اختياري)
+                عدد الدروس
               </label>
               <input
-                type="text"
-                placeholder="مثال: 10 ساعات أو 4 أسابيع"
+                type="number"
+                placeholder="مثال: 12"
                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-                value={courseDuration}
-                onChange={(e) => setCourseDuration(e.target.value)}
+                value={lessonsCount}
+                onChange={(e) => setLessonsCount(e.target.value)}
               />
             </div>
 
@@ -215,8 +306,16 @@ const Upload = () => {
             </div>
           ))}
         </div>
-        <button className="bg-blue-600 w-full text-white font-semibold px-8 py-3 rounded-lg shadow-md hover:bg-blue-700 transition transform hover:scale-105">
-          نشر الدورة
+        <button
+          onClick={handlePublish}
+          disabled={loading}
+          className={`w-full text-white font-semibold px-8 py-3 rounded-lg shadow-md transition transform ${
+            loading
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 hover:scale-105"
+          }`}
+        >
+          {loading ? "جاري الرفع..." : "نشر الدورة"}
         </button>
       </div>
     </TeacherLayout>

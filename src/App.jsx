@@ -57,7 +57,7 @@ function App() {
           }
         />
         <Route
-          path="/openedCourse/:name"
+          path="/openedCourse/:id"
           element={
             <PrivateRoute currentUser={currentUser}>
               <OpenedCourse />
